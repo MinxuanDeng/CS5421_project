@@ -22,12 +22,15 @@ INDEX_BEFORE_SEARCH_CONDITION = 4
 
 
 
-def validate_syntax(statement: str):
+def validate_syntax(statement: str)->Tuple[str, bool]:
     '''
     Valid raw statement input:
-    CREATE ASSERTION any_name CHECK (<search condition>) <constraint characteristics>
+    CREATE ASSERTION any_name CHECK (<search condition>)
 
     <search condition> ::= exists/not exists (sql statement)
+
+    Returns the extracted sql statement or boolean expression as the 1st parameter
+    The second parameter is a boolean value indicating whether the extracted statement is in '[NOT] EXISTS(' format
     '''
 
     tokens = pglast.parser.scan(statement)
@@ -54,10 +57,10 @@ def validate_syntax(statement: str):
     end_index = _get_search_condition_end_index(statement, tokens[INDEX_BEFORE_SEARCH_CONDITION:])
     search_condition = tokens[4: end_index+1]
     
-    ## check the validity of the search condition statement.
-    _validate_search_condition(statement, search_condition)
-
     ## TODO: handle constraint characteristics
+
+    ## check the validity of the search condition statement and return extract query
+    return _validate_search_condition(statement, search_condition)
 
 
 def _check_token(token:Any, name: str, type: str = RESERVED_KEYWORD)->bool:
@@ -90,10 +93,12 @@ def _get_search_condition_end_index(statement: str, remaining_tokens: Tuple[Any,
     return last_parenthesis_index+INDEX_BEFORE_SEARCH_CONDITION
 
 
-def _validate_search_condition(statement: str, search_condition_tokens: Tuple[Any, ...]):
+def _validate_search_condition(statement: str, search_condition_tokens: Tuple[Any, ...])->Tuple[str, bool]:
     '''
-    validates the search condition is in the below format
+    validates the search condition is in the below format and return the extracted statement
     [NOT] EXISTS (SQL Statement)
+    OR
+    (sql boolean expression)
     '''
 
     def strip_paretheses(tokens: Tuple[Any, ...])->Tuple[Any, ...]:
@@ -113,15 +118,37 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
     tokens = strip_paretheses(tokens)
 
     ## if the 1st token is 'NOT'
+    is_not = False
+    is_exist = False
     if _check_token(tokens[0], NOT_KEYWORD):
         tokens = strip_paretheses(tokens[1:])
+        is_not = True
     
-    ## check the 1st token is 'EXISTS' after stripping 'NOT' and parentheses
-    if not _check_token(tokens[0], EXISTS_KEYWORD, COL_NAME_KEYWORD):
-        raise ValueError(f'search statement does not contain exists keyword. statement: \'{statement}\'')
+    ## check the 1st token is 'EXISTS' or other sql boolean expression
+    if _check_token(tokens[0], EXISTS_KEYWORD, COL_NAME_KEYWORD):
+        tokens = strip_paretheses(tokens[1:])
+        is_exist = True
+    else:
+        tokens = strip_paretheses(tokens) 
+
 
     ## check the select statement inside the EXISTS clause
-    tokens = strip_paretheses(tokens[1:])
     start_index = tokens[0].start
     end_index = tokens[-1].end + 1
-    pglast.parser.parse_sql(statement[start_index: end_index])
+    inner_statement = statement[start_index: end_index]
+
+    ## statement is (sql boolean expression). put a dummy select statement before it
+    if not is_exist:
+        check_statement = f"select * from dummy_check where {inner_statement}"
+    else:
+        check_statement = inner_statement
+
+    pglast.parser.parse_sql(check_statement)
+
+    full_statement = \
+        (f"NOT " if is_not else "") + \
+        (f"EXIST(" if is_exist else "") + \
+        (f"{inner_statement}") + \
+        (f")" if is_exist else "")
+
+    return full_statement, is_exist

@@ -1,7 +1,7 @@
 def text2List(text):
     '''
     :param: plain valid sql text:
-    :return: a lisf of tokens(terminals)
+    :return: a list of tokens(terminals)
     it's actually a lexer, converting text into a list of strings(terminals)
     '''
     index = 0
@@ -274,12 +274,15 @@ def findTables(terminals):
     return sorted(ret)
 
 
-with open('input2.txt','r') as f:
-    # input contains the ddl with(without) complex check
-    # createDictionary would split complex checks out of ddl
-    text = f.read()
-    tokens = text2List(text)
-    #for i in range(len(tokens)):
-    #    print(i,tokens[i])
-    print(findTables(tokens))
+def detect_table(statement:str):
+    return findTables(text2List(statement))
+
+# with open('input2.txt','r') as f:
+#     # input contains the ddl with(without) complex check
+#     # createDictionary would split complex checks out of ddl
+#     text = f.read()
+#     tokens = text2List(text)
+#     #for i in range(len(tokens)):
+#     #    print(i,tokens[i])
+#     print(findTables(tokens))
 
