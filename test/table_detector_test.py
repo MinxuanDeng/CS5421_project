@@ -2,6 +2,7 @@ import pytest
 
 from .const import TEST_DATA_PATH, read_test_data_file
 from assertionCompiler import table_detector
+from assertionCompiler import table_detector_simple
 
 
 @pytest.mark.valid
@@ -21,12 +22,12 @@ def test_complex_statement():
 @pytest.mark.valid
 def test_boolean_expression_statement():
     statement = "table1.ID = table2.ID"
-    tables = table_detector.detect_table(statement)
+    tables = table_detector_simple.detect_table(statement)
     assert set(["table1", "table2"]) == set(tables), "failed to detect correct tables"
 
 
 @pytest.mark.valid
 def test_multiple_boolean_expression_statement():
     statement = "table1.ID = table2.ID AND table3.ID = table3.ID"
-    tables = table_detector.detect_table(statement)
+    tables = table_detector_simple.detect_table(statement)
     assert set(["table1", "table2", "table3"]) == set(tables), "failed to detect correct tables"

@@ -38,7 +38,7 @@ def test_simple_statement_not_exist():
     statement = VALID_ASSERTION_CREATEION_STATEMENT.format(statement=statement)
     extarcted, is_exist = validator.validate_syntax(statement)
     assert is_exist, "extracted statement should be in [NOT] EXISTS format"
-    assert extarcted == "NOT EXIST(select * from myTable)"
+    assert extarcted == "NOT EXISTS(select * from myTable)"
 
 
 @pytest.mark.valid
@@ -47,7 +47,7 @@ def test_simple_statement_parenthesis_after_not_keyword():
     statement = VALID_ASSERTION_CREATEION_STATEMENT.format(statement=statement)
     extarcted, is_exist = validator.validate_syntax(statement)
     assert is_exist, "extracted statement should be in [NOT] EXISTS format"
-    assert extarcted == "NOT EXIST(select * from myTable)"
+    assert extarcted == "NOT EXISTS(select * from myTable)"
 
 
 @pytest.mark.valid

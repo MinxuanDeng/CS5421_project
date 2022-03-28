@@ -1,10 +1,12 @@
 import argparse
 import pglast
 import traceback
+import sqlparse
 from typing import List
 
 from assertionCompiler import validator
 from assertionCompiler import table_detector
+from assertionCompiler import table_detector_simple
 
 
 def get_create_assertion_constraint_query(args: argparse.Namespace)->str:
@@ -28,12 +30,12 @@ def get_create_assertion_constraint_query(args: argparse.Namespace)->str:
 def transfrom_none_exists_statement(statement: str, tables: List[str], is_exist:bool)->str:
     '''
     transfrom sql bool statement(is_exist == False) to the below format
-    NOT EXISTS(!(SELECT * FROM tables WHERE <sql boolean expression>))
+    NOT EXISTS(SELECT * FROM tables WHERE NOT(<sql boolean expression>))
     '''
     if is_exist:
         return statement
     else:
-        return f" NOT EXISTS(!(SELECT * FROM {' '.join(tables)} WHERE {statement}))"
+        return f"NOT EXISTS(SELECT * FROM {','.join(tables)} WHERE NOT({statement}))"
 
 
 def parse_arguments(args:list)->argparse.Namespace:
@@ -58,7 +60,10 @@ def main(args=None):
             extracted_query, is_exist = validator.validate_syntax(s)
 
             ## extract tables
-            tables = table_detector.detect_table(extracted_query)
+            if is_exist:
+                tables = table_detector.detect_table(extracted_query)
+            else:
+                tables = table_detector_simple.detect_table(extracted_query)
 
             ## transform none-exists statement(sql boolean expression)
             extracted_query = transfrom_none_exists_statement(extracted_query, tables, is_exist) 
@@ -66,6 +71,7 @@ def main(args=None):
             ## TODO: generate function and triggers
 
             ## TODO: print output
+            print("Output:", sqlparse.format(extracted_query, reindent=True, keyword_case="upper"), sep="\n")
             
     except Exception as e:
         if args.verbose:

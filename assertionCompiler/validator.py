@@ -147,7 +147,7 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
 
     full_statement = \
         (f"NOT " if is_not else "") + \
-        (f"EXIST(" if is_exist else "") + \
+        (f"EXISTS(" if is_exist else "") + \
         (f"{inner_statement}") + \
         (f")" if is_exist else "")
 

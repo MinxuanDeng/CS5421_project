@@ -120,10 +120,10 @@ def generateComplexConstraint(simple_check:str):
 def detect_table(statement:str):
     return findTables(text2List(statement))
 
-
-simple_check = 'table1.annual_income = table1.salary * 12 and table2.age > 0 or table3.id = table2.id'
-print('the tables in simple checks are:')
-print(detect_table(simple_check))
-print()
-print('complex constraint generated from simple checks are:')
-print(generateComplexConstraint(simple_check))
+if __name__ == "__main__":
+    simple_check = 'table1.annual_income = table1.salary * 12 and table2.age > 0 or table3.id = table2.id'
+    print('the tables in simple checks are:')
+    print(detect_table(simple_check))
+    print()
+    print('complex constraint generated from simple checks are:')
+    print(generateComplexConstraint(simple_check))

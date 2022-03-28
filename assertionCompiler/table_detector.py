@@ -277,12 +277,13 @@ def findTables(terminals):
 def detect_table(statement:str):
     return findTables(text2List(statement))
 
-# with open('input2.txt','r') as f:
-#     # input contains the ddl with(without) complex check
-#     # createDictionary would split complex checks out of ddl
-#     text = f.read()
-#     tokens = text2List(text)
-#     #for i in range(len(tokens)):
-#     #    print(i,tokens[i])
-#     print(findTables(tokens))
+if __name__ == "__main__":
+    with open('input2.txt','r') as f:
+        # input contains the ddl with(without) complex check
+        # createDictionary would split complex checks out of ddl
+        text = f.read()
+        tokens = text2List(text)
+        #for i in range(len(tokens)):
+        #    print(i,tokens[i])
+        print(findTables(tokens))
 
