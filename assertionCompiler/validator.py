@@ -22,15 +22,16 @@ INDEX_BEFORE_SEARCH_CONDITION = 4
 
 
 
-def validate_syntax(statement: str)->Tuple[str, bool]:
+def validate_syntax(statement: str)->Tuple[str, str, str, bool]:
     '''
     Valid raw statement input:
     CREATE ASSERTION any_name CHECK (<search condition>)
 
     <search condition> ::= exists/not exists (sql statement)
 
-    Returns the extracted sql statement or boolean expression as the 1st parameter
-    The second parameter is a boolean value indicating whether the extracted statement is in '[NOT] EXISTS(' format
+    Returns the assertion name as the 1st parameter, prefix(exists or not exists) as the 2nd parameter, 
+    the extracted sql statement or boolean expression as the 3rd parameter and is_exist, a boolean value 
+    indicating whether the extracted statement is in '[NOT] EXISTS(' format as the 4th parameter
     '''
 
     tokens = pglast.parser.scan(statement)
@@ -60,7 +61,9 @@ def validate_syntax(statement: str)->Tuple[str, bool]:
     ## TODO: handle constraint characteristics
 
     ## check the validity of the search condition statement and return extract query
-    return _validate_search_condition(statement, search_condition)
+    prefix, inner_statement, is_exist = _validate_search_condition(statement, search_condition)
+    
+    return statement[tokens[2].start: tokens[2].end+1], prefix, inner_statement, is_exist
 
 
 def _check_token(token:Any, name: str, type: str = RESERVED_KEYWORD)->bool:
@@ -93,7 +96,7 @@ def _get_search_condition_end_index(statement: str, remaining_tokens: Tuple[Any,
     return last_parenthesis_index+INDEX_BEFORE_SEARCH_CONDITION
 
 
-def _validate_search_condition(statement: str, search_condition_tokens: Tuple[Any, ...])->Tuple[str, bool]:
+def _validate_search_condition(statement: str, search_condition_tokens: Tuple[Any, ...])->Tuple[str, str, bool]:
     '''
     validates the search condition is in the below format and return the extracted statement
     [NOT] EXISTS (SQL Statement)
@@ -145,10 +148,8 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
 
     pglast.parser.parse_sql(check_statement)
 
-    full_statement = \
+    prefix = \
         (f"NOT " if is_not else "") + \
-        (f"EXISTS(" if is_exist else "") + \
-        (f"{inner_statement}") + \
-        (f")" if is_exist else "")
+        (f"EXISTS" if is_exist else "")
 
-    return full_statement, is_exist
+    return prefix, inner_statement, is_exist

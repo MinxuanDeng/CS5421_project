@@ -24,6 +24,7 @@ $ pacc -h
 ```
 
 ## Testing
+### Pytest
 Install dependency
 ```
 $ pip install -r ./CS5421_project/requirements-test.txt
@@ -32,4 +33,10 @@ $ pip install -r ./CS5421_project/requirements-test.txt
 Run pytest
 ```
 pytest ./CS5421_project/test
+```
+
+### Manual test
+There are couple of test sql files under ./test_data folder
+```
+$ pacc -f ./test_data/complex_boolean_text_query.sql -d -v
 ```
