@@ -146,7 +146,15 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
     else:
         check_statement = inner_statement
 
-    pglast.parser.parse_sql(check_statement)
+    ast = pglast.parser.parse_sql(check_statement)
+
+    ## if statement is (sql boolean expression), it cannot contain a select statement
+    if not is_exist:
+        root = pglast.Node(ast)
+        for node in root[0].stmt.whereClause.traverse():
+            if isinstance(node, pglast.Node) and node.node_tag == "SelectStmt":
+                    raise ValueError("Simple check must not contain select statement. Only (table1.id=table2.id AND ...) format is accepted. "\
+                        "Consider rewriting it to complex check: NOT EXISTS(select statement)")
 
     prefix = \
         (f"NOT " if is_not else "") + \

@@ -179,3 +179,62 @@ def test_simple_statement_sql_boolean_expression_invalid_full_statement():
     statement = VALID_ASSERTION_CREATEION_STATEMENT.format(statement=statement)
     with pytest.raises(pglast.Error) as exc_info:
         validator.validate_syntax(statement)
+
+
+@pytest.mark.invalid
+def test_complex_boolean_expression_statement():
+    statement = \
+    """
+CREATE assertion any_assertion CHECK(
+    1 < (
+        SELECT
+            COUNT(*)
+        FROM
+            (
+                with temp(attrA, attrB) as (
+                    select
+                        *
+                    from
+                        (
+                            with temp2(foo) as (
+                                select
+                                    *
+                                from
+                                    table1
+                            )
+                            select
+                                *
+                            from
+                                temp2
+                        ) t1
+                        inner join (
+                            select
+                                *
+                            from
+                                table2 tt
+                        ) t2 on t1.attrC = t2.attrE + 5 << factorial(2)
+                    where
+                        t1.attrD = |/ 16 % 25
+                )
+                select
+                    *
+                from
+                    table3 t3,
+                    table4
+                where
+                    t3.attrG = table4.attrH
+                    and table4.attrI in (
+                        select
+                            attrA
+                        from
+                            temp
+                    )
+            ) as t
+    )
+);
+    """
+
+    with pytest.raises(ValueError) as exc_info:
+        validator.validate_syntax(statement)
+
+    assert "Simple check must not contain select statement" in str(exc_info)
