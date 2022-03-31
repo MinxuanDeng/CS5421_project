@@ -7,7 +7,7 @@ def text2List(text):
     index = 0
     buffer = ''
     ret_list = list()
-    cutter = {',',';','*','(',')','=','+','-','/','%','^','#','~','\'','@','.'}
+    cutter = {',',';','*','(',')','=','+','-','/','%','^','#','~','@','.'}
     while(index<len(text)):
         if text[index] == ' ' or text[index] == '\t':
             if buffer != '':
@@ -82,6 +82,17 @@ def text2List(text):
             else:
                 ret_list.append('|')
                 index += 1
+        elif text[index] == '\'':
+            if buffer != '':
+                ret_list.append(buffer)
+            buffer = '\''
+            index += 1
+            while len(text) > index and text[index] != '\'':
+                buffer += text[index]
+                index += 1
+            buffer += '\"'
+            index += 1
+
         else:
             buffer += text[index]
             index += 1
