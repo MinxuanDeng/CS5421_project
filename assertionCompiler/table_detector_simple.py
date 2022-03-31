@@ -90,7 +90,7 @@ def text2List(text):
             while len(text) > index and text[index] != '\'':
                 buffer += text[index]
                 index += 1
-            buffer += '\"'
+            buffer += '\''
             index += 1
 
         else:
