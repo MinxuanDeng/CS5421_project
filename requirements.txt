@@ -1,2 +1,1 @@
 pglast==v3
-sqlparse==0.4.2

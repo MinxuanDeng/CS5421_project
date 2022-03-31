@@ -1,12 +1,12 @@
 import argparse
 import pglast
 import traceback
-import sqlparse
-from typing import List, Tuple
+from typing import List
 
 from assertionCompiler import validator
 from assertionCompiler import table_detector
 from assertionCompiler import table_detector_simple
+from assertionCompiler import gen_all
 
 
 DEBUG_ENABLE = False
@@ -89,10 +89,15 @@ def main(args=None):
             debug_print(f"Step2 result: \n{{tables: {tables}, query: {extracted_query}}}\n")
 
             ## TODO: generate function and triggers
+            results = gen_all.gen_code(tables, extracted_query, assertion_name)
 
             ## TODO: print output
-            print("Output:", sqlparse.format(extracted_query, reindent=True, keyword_case="upper"), sep="\n")
+            print("Output:")
+            for result in results:
+                print("")
+                print(result)
             
+
     except Exception as e:
         if args.verbose:
             print(traceback.format_exc())
