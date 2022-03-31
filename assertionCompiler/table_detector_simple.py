@@ -100,7 +100,7 @@ def findTables(terminals):
     '''
     ret_set = set()
     for i in range(0,len(terminals)):
-        if i+1 < len(terminals) and terminals[i+1] == '.':
+        if i+1 < len(terminals) and terminals[i+1] == '.' and not terminals[i].isdigit():
             ret_set.add(terminals[i])
     return sorted(list(ret_set))
 
