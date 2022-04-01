@@ -268,9 +268,12 @@ def findTablesRecursion(terminals, clauseBegin, clauseEnd):
                         break
                     else:
                          index += 1
+        elif terminals[index] == 'with':
+            temp_tables.add(terminals[index+1])
+            index += 2
         else:
             index += 1
-    return tables,temp_tables
+    return tables.difference(temp_tables)
 
 def findTables(terminals):
     '''
@@ -279,9 +282,8 @@ def findTables(terminals):
     find all tables involved in a query except for temp tables(with clause)
     '''
     index = 0
-    tables,temp_tables = findTablesRecursion(terminals,0,len(terminals))
-    ret = tables.difference(temp_tables)
-    return sorted(ret)
+    tables = findTablesRecursion(terminals,0,len(terminals))
+    return sorted(tables)
 
 
 def detect_table(statement:str):
