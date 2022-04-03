@@ -1,8 +1,8 @@
 import pytest
 
-from .const import TEST_DATA_PATH, read_test_data_file
-from assertionCompiler import table_detector
-from assertionCompiler import table_detector_simple
+from .const import read_test_data_file
+from src import table_detector
+from src import table_detector_simple
 
 
 @pytest.mark.valid

@@ -1,7 +1,7 @@
 import pytest
 import pglast
 
-from assertionCompiler import validator
+from src import validator
 
 
 VALID_ASSERTION_CREATEION_STATEMENT = "create assertion any_assertion check ({statement});"

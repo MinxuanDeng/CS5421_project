@@ -2,10 +2,8 @@ import pytest
 import argparse
 import os
 
+from cli import cli
 from .const import TEST_DATA_PATH
-from assertionCompiler import cli
-
-
 
 @pytest.mark.valid
 def test_simple_statement():

@@ -1,12 +1,15 @@
 import argparse
 import pglast
 import traceback
+import sys
+import os
 from typing import List
 
-from assertionCompiler import validator
-from assertionCompiler import table_detector
-from assertionCompiler import table_detector_simple
-from assertionCompiler import gen_all
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src import validator
+from src import table_detector
+from src import table_detector_simple
+from src import gen_all
 
 
 DEBUG_ENABLE = False
@@ -103,3 +106,7 @@ def main(args=None):
             print(traceback.format_exc())
         else:
             print(f'Failed to compile input statement. err: {e}')
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
