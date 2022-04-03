@@ -40,7 +40,7 @@ def test_simple_statement_not_exist():
     assert is_exist, "extracted statement should be in [NOT] EXISTS format"
     assert name == "any_assertion"
     assert prefix == "NOT EXISTS"
-    assert extarcted == "select * from myTable"
+    assert extarcted == "(select * from myTable)"
 
 
 @pytest.mark.valid
@@ -51,7 +51,7 @@ def test_simple_statement_parenthesis_after_not_keyword():
     assert is_exist, "extracted statement should be in [NOT] EXISTS format"
     assert name == "any_assertion"
     assert prefix == "NOT EXISTS"
-    assert extarcted == "select * from myTable"
+    assert extarcted == "(select * from myTable)"
 
 
 @pytest.mark.valid
@@ -72,19 +72,19 @@ def test_simple_statement_sql_boolean_expression_not():
     name, prefix, extarcted, is_exist = validator.validate_syntax(statement)
     assert not is_exist, "extracted statement should be in sql boolean expression format"
     assert name == "any_assertion"
-    assert prefix == "NOT "
-    assert extarcted == "table1.ID = table2.ID"
+    assert prefix == ""
+    assert extarcted == "not table1.ID = table2.ID"
 
 
 @pytest.mark.valid
 def test_simple_statement_sql_boolean_expression_multiple_condition():
-    statement = "table1.ID = table2.ID and table3.ID = table1.ID"
+    statement = "(table1.ID = table2.ID) and table3.ID = table1.ID"
     statement = VALID_ASSERTION_CREATEION_STATEMENT.format(statement=statement)
     name, prefix, extarcted, is_exist = validator.validate_syntax(statement)
     assert not is_exist, "extracted statement should be in sql boolean expression format"
     assert name == "any_assertion"
     assert prefix == ""
-    assert extarcted == "table1.ID = table2.ID and table3.ID = table1.ID"
+    assert extarcted == "(table1.ID = table2.ID) and table3.ID = table1.ID"
 
 
 @pytest.mark.invalid

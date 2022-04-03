@@ -116,9 +116,8 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
     if len(search_condition_tokens) < MINIMUM_SEARCH_CONDITION_TOKEN_LENGTH:
         raise ValueError(f'Search condition statement does not match minimum token length. statement: \'{statement}\'')
 
-    ## strip all outer parentheses
-    tokens = copy.deepcopy(search_condition_tokens)
-    tokens = strip_paretheses(tokens)
+    ## strip the outer parentheses
+    tokens = copy.deepcopy(search_condition_tokens)[1:-1]
 
     ## if the 1st token is 'NOT'
     is_not = False
@@ -127,13 +126,19 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
         tokens = tokens[1:]
         is_not = True
     
-    ## check the 1st token is 'EXISTS' or other sql boolean expression
-    if _check_token(tokens[0], EXISTS_KEYWORD, COL_NAME_KEYWORD):
-        tokens = tokens[1:]
-        is_exist = True
+    ## check the 1st non-bracket token is 'EXISTS' or other sql boolean expression
+    for token in tokens:
+        if not _check_token(token, LEFT_PARENTHESIS, NO_KEYWORD):
+            if _check_token(token, EXISTS_KEYWORD, COL_NAME_KEYWORD):
+                is_exist = True
+            break
+    
+    ## if it is 'EXISTS' strips all the brackets until EXISTS and the inner query will be the tokens after EXISTS
+    ## else it is a boolean expression return the original tokens stripping the brackets
+    if is_exist:
+        tokens = strip_paretheses(tokens)[1:]
     else:
-        tokens = tokens
-
+        tokens = copy.deepcopy(search_condition_tokens)[1:-1]
 
     ## check the select statement inside the EXISTS clause
     start_index = tokens[0].start
@@ -156,8 +161,6 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
                     raise ValueError("Simple check must not contain select statement. Only (table1.id=table2.id AND ...) format is accepted. "\
                         "Consider rewriting it to complex check: NOT EXISTS(select statement)")
 
-    prefix = \
-        (f"NOT " if is_not else "") + \
-        (f"EXISTS" if is_exist else "")
+    prefix = f"{'NOT ' if is_not else ''}EXISTS" if is_exist else ""
 
     return prefix, inner_statement, is_exist

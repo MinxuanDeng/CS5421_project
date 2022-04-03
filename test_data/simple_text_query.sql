@@ -5,7 +5,7 @@ CREATE assertion single_table_assertion CHECK (
         FROM
             mytable1
         where
-            id = 1;
+            id = 1
 
 )
 );
@@ -18,7 +18,7 @@ CREATE assertion multiple_table_assertion CHECK (
             mytable1 t1
             join mytable2 t2 on t1.ID = t2.ID
         where
-            mytable1.Name = 'Tom';
+            mytable1.Name = 'Tom'
 
 )
 );
