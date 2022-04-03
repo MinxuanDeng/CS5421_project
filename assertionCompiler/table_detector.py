@@ -251,9 +251,9 @@ def findTablesRecursion(terminals, clauseBegin, clauseEnd):
                 if readTable:
                     if terminals[index] == '(':
                         sub_clause_end = findSubClauseEnd(terminals,index)
-                        ret_tables,ret_temp_tables = findTablesRecursion(terminals,index+1,sub_clause_end-1)
+                        ret_tables = findTablesRecursion(terminals,index+1,sub_clause_end-1)
                         tables = tables.union(ret_tables.copy())
-                        temp_tables = temp_tables.union(ret_temp_tables.copy())
+                        #temp_tables = temp_tables.union(ret_temp_tables.copy())
                         index = sub_clause_end
                     elif index < clauseEnd and terminals[index] not in end_of_from :
                         # the current token is the table name
