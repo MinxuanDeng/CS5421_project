@@ -1,8 +1,11 @@
-create assertion foo check
-(
-    not exists (
-        (select sid as temp from instruct where sid not in (select * from student))
-        union
-        (select iid as temp from instruct where iid not in (select * from professor))
+CREATE ASSERTION foo CHECK(
+    NOT EXISTS(
+        (SELECT sid AS temp FROM instruct WHERE sid NOT IN (
+            SELECT * FROM student
+        )) 
+        UNION
+        (SELECT iid AS temp FROM instruct WHERE iid NOT IN (
+            SELECT * FROM professor
+        ))
     )
 )

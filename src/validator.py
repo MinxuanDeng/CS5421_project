@@ -124,15 +124,15 @@ def _validate_search_condition(statement: str, search_condition_tokens: Tuple[An
     is_not = False
     is_exist = False
     if _check_token(tokens[0], NOT_KEYWORD):
-        tokens = strip_paretheses(tokens[1:])
+        tokens = tokens[1:]
         is_not = True
     
     ## check the 1st token is 'EXISTS' or other sql boolean expression
     if _check_token(tokens[0], EXISTS_KEYWORD, COL_NAME_KEYWORD):
-        tokens = strip_paretheses(tokens[1:])
+        tokens = tokens[1:]
         is_exist = True
     else:
-        tokens = strip_paretheses(tokens) 
+        tokens = tokens
 
 
     ## check the select statement inside the EXISTS clause
